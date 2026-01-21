@@ -14,28 +14,18 @@ async function main() {
 
         console.log('\n--- Git Diff (Unstaged) ---');
         const diff = await git.getDiff();
-        console.log(diff ? diff.slice(0, 200) + '...' : 'No unstaged changes');
+        console.log(diff ? diff.slice(0, 100) + '...' : 'No unstaged changes');
 
-        console.log('\n--- Git Log (Last 1) ---');
-        const logStr = await git.getLog(1);
-        const log = JSON.parse(logStr);
-        console.log(log[0]);
-        const latestHash = log[0].hash;
+        console.log('\n--- Git Diff (Unstaged) - Filtered to .gitignore ---');
+        const diffFiltered = await git.getDiff(false, ['.gitignore']);
+        console.log(diffFiltered ? diffFiltered : 'No changes in .gitignore');
 
-        console.log('\n--- Git Show (Latest Commit) ---');
-        const show = await git.getShow(latestHash);
-        console.log(show.slice(0, 200) + '...');
-
-        console.log('\n--- Git Blame (package.json) ---');
-        const blame = await git.getBlame('package.json');
-        console.log(blame.slice(0, 200) + '...');
-
-        console.log('\n--- Git Diff (HEAD~1..HEAD) ---');
+        console.log('\n--- Git Diff (HEAD~1..HEAD) - Filtered to package.json ---');
         try {
-            const diffBase = await git.getDiffBase('HEAD', 'HEAD~1');
-            console.log(diffBase.slice(0, 200) + '...');
+            const diffBase = await git.getDiffBase('HEAD', 'HEAD~1', ['package.json']);
+            console.log(diffBase.slice(0, 100) + '...');
         } catch (e) {
-            console.log('Could not diff HEAD~1 (maybe shallow clone or not enough history)');
+            console.log('Could not diff HEAD~1');
         }
 
     } catch (error) {

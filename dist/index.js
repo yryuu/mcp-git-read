@@ -44,6 +44,11 @@ const tools = [
                     type: 'string',
                     description: 'Optional: Source branch/commit to compare against target. Used as `git diff target source`.',
                 },
+                files: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Optional: List of files to include in the diff. If omitted, shows all changed files.',
+                },
             },
         },
     },
@@ -111,12 +116,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const staged = args?.staged;
                 const target = args?.target;
                 const source = args?.source;
+                const files = args?.files || [];
                 let diff;
                 if (target) {
-                    diff = await gitManager.getDiffBase(target, source);
+                    diff = await gitManager.getDiffBase(target, source, files);
                 }
                 else {
-                    diff = await gitManager.getDiff(staged);
+                    diff = await gitManager.getDiff(staged, files);
                 }
                 // Truncate output if too large (e.g., > 100KB)
                 const MAX_LENGTH = 100 * 1024;

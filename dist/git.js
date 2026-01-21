@@ -7,8 +7,11 @@ export class GitManager {
     async getStatus() {
         return this.git.status();
     }
-    async getDiff(staged = false) {
+    async getDiff(staged = false, files = []) {
         const options = staged ? ['--staged'] : [];
+        if (files.length > 0) {
+            options.push('--', ...files);
+        }
         return this.git.diff(options);
     }
     async getLog(maxCount = 10) {
@@ -24,12 +27,16 @@ export class GitManager {
         // target can be a commit hash or "rev:path"
         return this.git.show([target]);
     }
-    async getDiffBase(target, source) {
+    async getDiffBase(target, source, files = []) {
         // usage: diff base..target or simply diff target (against working tree/index depending on usage)
         // strict diff: git diff target source
+        const args = [target];
         if (source) {
-            return this.git.diff([target, source]);
+            args.push(source);
         }
-        return this.git.diff([target]);
+        if (files.length > 0) {
+            args.push('--', ...files);
+        }
+        return this.git.diff(args);
     }
 }

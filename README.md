@@ -64,6 +64,7 @@ Returns the diff of the repository.
 - `staged` (boolean, optional): If true, shows cached (staged) changes.
 - `target` (string, optional): Target branch/commit to compare.
 - `source` (string, optional): Source branch/commit.
+- `files` (array of strings, optional): List of files to include in the diff.
 
 ### `git_log`
 Returns the commit log.

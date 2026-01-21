@@ -11,8 +11,11 @@ export class GitManager {
         return this.git.status();
     }
 
-    async getDiff(staged: boolean = false): Promise<string> {
+    async getDiff(staged: boolean = false, files: string[] = []): Promise<string> {
         const options = staged ? ['--staged'] : [];
+        if (files.length > 0) {
+            options.push('--', ...files);
+        }
         return this.git.diff(options);
     }
 
@@ -32,12 +35,16 @@ export class GitManager {
         return this.git.show([target]);
     }
 
-    async getDiffBase(target: string, source?: string): Promise<string> {
+    async getDiffBase(target: string, source?: string, files: string[] = []): Promise<string> {
         // usage: diff base..target or simply diff target (against working tree/index depending on usage)
         // strict diff: git diff target source
+        const args = [target];
         if (source) {
-            return this.git.diff([target, source]);
+            args.push(source);
         }
-        return this.git.diff([target]);
+        if (files.length > 0) {
+            args.push('--', ...files);
+        }
+        return this.git.diff(args);
     }
 }
