@@ -136,6 +136,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     diff = await gitManager.getDiff(staged);
                 }
 
+                // Truncate output if too large (e.g., > 100KB)
+                const MAX_LENGTH = 100 * 1024;
+                if (diff && diff.length > MAX_LENGTH) {
+                    diff = diff.substring(0, MAX_LENGTH) + '\n... Output truncated due to size limit ...';
+                }
+
                 return {
                     content: [
                         {
