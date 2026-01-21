@@ -1,0 +1,34 @@
+{
+    "name": "mcp-git-read",
+    "version": "1.0.0",
+    "description": "MCP server for reading git status and diff for code review",
+    "type": "module",
+    "main": "dist/index.js",
+    "bin": {
+        "mcp-git-read": "dist/index.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "test": "tsx test/manual-test.ts"
+    },
+    "keywords": [
+        "mcp",
+        "git",
+        "code-review"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.0.4",
+        "simple-git": "^3.24.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.5",
+        "tsx": "^4.19.2",
+        "typescript": "^5.7.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
