@@ -36,7 +36,24 @@ const tools: Tool[] = [
         description: 'Get the git status of the repository. Returns modified, staged, and untracked files.',
         inputSchema: {
             type: 'object',
-            properties: {},
+        },
+    },
+    {
+        name: 'git_changed_files',
+        description: 'Get list of changed files between branches or commits. Useful for listing files to review in a PR.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                target: {
+                    type: 'string',
+                    description: 'Target branch/commit to compare.',
+                },
+                source: {
+                    type: 'string',
+                    description: 'Optional: Source branch/commit to compare against target. Used as `git diff --name-only target...source`.',
+                },
+            },
+            required: ['target'],
         },
     },
     {
@@ -61,6 +78,10 @@ const tools: Tool[] = [
                     type: 'array',
                     items: { type: 'string' },
                     description: 'Optional: List of files to include in the diff. If omitted, shows all changed files.',
+                },
+                use_3_dot: {
+                    type: 'boolean',
+                    description: 'If true, uses 3-dot comparison (target...source) which shows changes in source since it branched from target. Default is false.',
                 },
             },
         },
@@ -129,15 +150,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 };
             }
 
+            case 'git_changed_files': {
+                const target = args?.target as string;
+                const source = args?.source as string | undefined;
+                const files = await gitManager.getChangedFiles(target, source);
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(files, null, 2),
+                        },
+                    ],
+                };
+            }
+
             case 'git_diff': {
                 const staged = args?.staged as boolean | undefined;
                 const target = args?.target as string | undefined;
                 const source = args?.source as string | undefined;
                 const files = (args?.files as string[]) || [];
+                const use_3_dot = (args?.use_3_dot as boolean) || false;
 
                 let diff;
                 if (target) {
-                    diff = await gitManager.getDiffBase(target, source, files);
+                    diff = await gitManager.getDiffBase(target, source, files, use_3_dot);
                 } else {
                     diff = await gitManager.getDiff(staged, files);
                 }

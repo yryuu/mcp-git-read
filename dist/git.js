@@ -27,16 +27,34 @@ export class GitManager {
         // target can be a commit hash or "rev:path"
         return this.git.show([target]);
     }
-    async getDiffBase(target, source, files = []) {
+    async getDiffBase(target, source, files = [], useThreeDot = false) {
         // usage: diff base..target or simply diff target (against working tree/index depending on usage)
         // strict diff: git diff target source
-        const args = [target];
-        if (source) {
-            args.push(source);
+        const args = [];
+        if (source && useThreeDot) {
+            args.push(`${target}...${source}`);
+        }
+        else {
+            args.push(target);
+            if (source) {
+                args.push(source);
+            }
         }
         if (files.length > 0) {
             args.push('--', ...files);
         }
         return this.git.diff(args);
+    }
+    async getChangedFiles(target, source) {
+        const args = ['--name-only'];
+        // For changed files in a PR, we almost always want triple-dot comparison if a source is provided
+        if (source) {
+            args.push(`${target}...${source}`);
+        }
+        else {
+            args.push(target);
+        }
+        const result = await this.git.diff(args);
+        return result.split('\n').filter(line => line.length > 0);
     }
 }

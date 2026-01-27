@@ -16,17 +16,20 @@ async function main() {
         const diff = await git.getDiff();
         console.log(diff ? diff.slice(0, 100) + '...' : 'No unstaged changes');
 
-        console.log('\n--- Git Diff (Unstaged) - Filtered to .gitignore ---');
-        const diffFiltered = await git.getDiff(false, ['.gitignore']);
-        console.log(diffFiltered ? diffFiltered : 'No changes in .gitignore');
-
-        console.log('\n--- Git Diff (HEAD~1..HEAD) - Filtered to package.json ---');
+        console.log('\n--- Changed Files (Working Tree vs main) ---');
         try {
-            const diffBase = await git.getDiffBase('HEAD', 'HEAD~1', ['package.json']);
-            console.log(diffBase.slice(0, 100) + '...');
+            const files = await git.getChangedFiles('main');
+            console.log('Changed files:', files);
         } catch (e) {
-            console.log('Could not diff HEAD~1');
+            console.log('Error getting changed files:', e);
         }
+
+        console.log('\n--- Git Diff (Working Tree vs main) - src/git.ts ---');
+        try {
+            const diff = await git.getDiffBase('main', undefined, ['src/git.ts']);
+            console.log(diff ? diff : 'No diff');
+        } catch (e) { console.log(e); }
+
 
     } catch (error) {
         console.error('Error:', error);
