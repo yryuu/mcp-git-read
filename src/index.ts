@@ -36,6 +36,7 @@ const tools: Tool[] = [
         description: 'Get the git status of the repository. Returns modified, staged, and untracked files.',
         inputSchema: {
             type: 'object',
+            properties: {},
         },
     },
     {
